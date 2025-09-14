@@ -1,7 +1,7 @@
 import os
 
 from flask import Flask, render_template, request, url_for, redirect, jsonify, send_file
-from AI import define_text, detailed_explanation, diagram_text
+from AI import define_text, detailed_explanation, question_text
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -17,6 +17,7 @@ def serve_manifest():
 
 @app.route("/explain", methods=["POST"])
 def explain():
+    processing = False
     data = request.get_json()
 
     if not data or "text" not in data:
@@ -24,6 +25,7 @@ def explain():
 
     selected_text = data.get("text", "")
     mode = data.get("mode", "simplified")  # default is simplified
+    question = data.get("question", "")
 
     if not selected_text:
         return jsonify({"error": "No text provided"}), 400
@@ -31,15 +33,18 @@ def explain():
     print(f"Selected text: {selected_text}, Mode: {mode}")
 
     # Call different AI functions depending on mode
-    if mode == "simplified":
+    if mode == "simplified" and not processing:
         reply = define_text(selected_text)
-    elif mode == "detailed":
+        processing = True
+    elif mode == "detailed" and not processing:
         reply = detailed_explanation(selected_text)
-    elif mode == "diagrams":
-        reply = diagram_text(selected_text)
+        processing = True
+    elif mode == "question" and not processing:
+        reply = question_text(selected_text, question)
+        processing = True
     else:
         reply = "Unknown mode."
-
+    processing = False
     return jsonify({"reply": reply})
 
 

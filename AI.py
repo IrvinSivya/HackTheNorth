@@ -23,43 +23,35 @@ def call_gemini(selected_text, role_instruction):
     return response.text
 
 def define_text(selected_text: str) -> str:
-    """Return a simplified, context-aware definition in jot note style 
-    
-    (Format:)
-    • Point 1....
-    • Point 2....
-    
-    """
-    prompt = (
-        f"Act as a professional dictionary. Define the following text in **i-jot note format**: "
-        f"short bullet points, dashes, very concise. Use relevant context or related info. "
-        f"No full sentences unless essential. Avoid extra explanations.\n\n"
-        f"Text: {selected_text}"
+    system_prompt = (
+        f"You are a dictionary. Provide only concise definitions of the given text."
+        f"Keep the response under 2 lines and avoid extra explanations."
+        f"Do NOT include BOLD letters or asterics in you answers"
     )
-    return call_gemini(selected_text, prompt)
+    return call_gemini(selected_text, system_prompt)
 
 def detailed_explanation(selected_text: str) -> str:
-    """Return a detailed, context-aware explanation in i-jot note style 
-    
-    (Format:)
-    • Point 1....
-    • Point 2.... 
-    
+    """Return a detailed, context-aware explanation. Respond without using any asterisks and no bolding. 
     """
-    prompt = (
-        f"Act as an expert tutor. Explain the following text in **i-jot note format**: "
-        f"short bullet points, dashes, concise phrases. Include relevant context, examples, "
-        f"analogies, and connections to related concepts. Avoid long sentences.\n\n"
-        f"Text: {selected_text}"
+    system_prompt = (
+        f"You are an explainer. Summarize the given text in clear, simple language."
+        f"Keep the response under 10 lines, but make sure to explain key concepts so the reader fully understands them."
+        f"Avoid unnecessary detail or repetition."
+        f"Do NOT include BOLD letters or asterics in you answers"
     )
-    return call_gemini(selected_text, prompt)
+    return call_gemini(selected_text, system_prompt)
 
 
-def diagram_text(selected_text):
+def question_text(selected_text, question):
     """Useful diagrams or visual aids."""
-    return call_gemini(
-        selected_text,
-        "You are a visual teacher. Provide useful diagrams or schematic descriptions. "
-        "If diagrams cannot be drawn directly, use ASCII art or describe clearly what the diagram should look like. "
-        "Format your response in Markdown, using code blocks (```) for ASCII art."
-    )
+    print(question)
+    system_prompt = (
+        f"You are a knowledgeable tutor and assistant. Answer the user's questions about the given text clearly and accurately "
+        f"that helps users understand selected text.  "
+        f"Base your answer on the text first, and only add outside knowledge if it helps clarify the meaning. "
+        f"Keep explanations concise, clear, and directly tied to the selected text."
+        f"If the question is not related to text at all then just provide the best possible answer."
+        f"Do NOT include BOLD letters or asterics in you answers"
+        f"Do NOT ask back questions")
+    return call_gemini(selected_text + "Question is: " + question , system_prompt)
+

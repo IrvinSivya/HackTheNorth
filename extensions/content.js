@@ -71,12 +71,20 @@ function showPopup(initialMessage) {
       <div style="display: flex; gap: 6px; flex: 1;">
         <button id="tab-simplified" class="ai-tab active">Simplified</button>
         <button id="tab-detailed" class="ai-tab">Detailed</button>
-        <button id="tab-diagrams" class="ai-tab">Diagrams</button>
+        <button id="tab-questions" class="ai-tab">Questions</button>
       </div>
       <button id="close-popup" style="border:none; background:none; font-size:16px; cursor:pointer; color:#666;">×</button>
     </div>
-    <div id="popup-content" style="padding: 12px; max-height: 250px; overflow-y: auto; font-size:14px; line-height:1.4;">
+    <div id="popup-content" style="padding: 12px; max-height: 200px; overflow-y: auto; font-size:14px; line-height:1.4;">
       ${initialMessage}
+    </div>
+    <div id="question-box" style="display:none; border-top:1px solid #ddd; padding:6px; background:#fafafa;">
+      <input type="text" id="user-question" placeholder="Ask about this text..." 
+        style="width:80%; padding:6px; font-size:13px; border:1px solid #ccc; border-radius:4px;">
+      <button id="send-question" 
+        style="width:18%; padding:6px; font-size:13px; border:none; background:#007bff; color:white; border-radius:4px; cursor:pointer;">
+        Ask
+      </button>
     </div>
   `;
 
@@ -105,18 +113,46 @@ function showPopup(initialMessage) {
   `;
   document.head.appendChild(style);
 
-  // Event listeners
+  // Event listeners for tabs
   document.getElementById("tab-simplified").addEventListener("click", () => {
     setActiveTab("tab-simplified");
+    document.getElementById("question-box").style.display = "none";
     requestMode("simplified");
   });
+
   document.getElementById("tab-detailed").addEventListener("click", () => {
     setActiveTab("tab-detailed");
+    document.getElementById("question-box").style.display = "none";
     requestMode("detailed");
   });
-  document.getElementById("tab-diagrams").addEventListener("click", () => {
-    setActiveTab("tab-diagrams");
-    requestMode("diagrams");
+
+  document.getElementById("tab-questions").addEventListener("click", () => {
+    setActiveTab("tab-questions");
+    document.getElementById("question-box").style.display = "block";
+    document.getElementById("popup-content").innerHTML = "Type a question below 👇";
+  });
+
+  // Ask button logic
+  document.getElementById("send-question").addEventListener("click", () => {
+    const qInput = document.getElementById("user-question");
+    const question = qInput.value.trim();
+    if (!question) return;
+    const popupContent = document.getElementById("popup-content");
+    popupContent.innerHTML = "Thinking...";
+
+    fetch("http://127.0.0.1:5000/explain", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: lastSelectedText, mode: "question", question: question })
+    })
+    .then(res => res.json())
+    .then(data => {
+      popupContent.innerHTML = data.reply;
+    })
+    .catch(err => {
+      console.error("❌ Question fetch error:", err);
+      popupContent.innerHTML = "Error fetching answer.";
+    });
   });
 
   document.getElementById("close-popup").addEventListener("click", () => {
@@ -168,43 +204,3 @@ function setActiveTab(tabId) {
   });
   document.getElementById(tabId).classList.add("active");
 }
-
-
-
-/*
-
-Background.js
-
-chrome.commands.onCommand.addListener((command) => {
-    console.log("Command triggered:", command); // <-- should appear when you press shortcut
-    if (command === "send_selected_text") {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (!tabs[0]) return console.warn("No active tab");
-            chrome.tabs.sendMessage(tabs[0].id, { action: "get_selected_text" }, (response) => {
-                console.log("Response from content script:", response?.selectedText);
-            });
-        });
-    }
-});
-
-manifest.json
-
-{
-  "manifest_version": 3,
-  "name": "Intellisage",
-  "version": "1.0",
-  "permissions": ["tabs", "activeTab", "scripting", "storage"],
-  "background": { "service_worker": "background.js" },
-  "content_scripts": [
-    { "matches": ["<all_urls>"], "js": ["content.js"] }
-  ],
-  "commands": {
-    "send_selected_text": {
-      "suggested_key": { "default": "Ctrl+Shift+K" },
-      "description": "Send selected text to Python"
-    }
-  }
-}
-
-
-*/

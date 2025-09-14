@@ -1,0 +1,31 @@
+.wiki-hover {
+  background-color: yellow;
+  cursor: pointer;
+}
+
+#wiki-popup {
+  position: absolute;
+  background: white;
+  border: 1px solid #aaa;
+  padding: 8px;
+  border-radius: 6px;
+  z-index: 9999;
+  width: 200px;
+  box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
+}
+
+#wiki-popup .tab {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 5px;
+}
+#wiki-popup button {
+  flex: 1;
+  padding: 4px;
+  border: none;
+  background: #eee;
+  cursor: pointer;
+}
+#wiki-popup .content {
+  font-size: 14px;
+}

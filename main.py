@@ -1,7 +1,7 @@
 import os
 
 from flask import Flask, render_template, request, url_for, redirect, jsonify, send_file
-from AI import define_text
+from AI import define_text, detailed_explanation, diagram_text
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -19,21 +19,30 @@ def serve_manifest():
 def explain():
     data = request.get_json()
 
-    #Checks if the data is valid and contains the 'text' key
     if not data or "text" not in data:
-        return jsonify({"error": "Invalid input"}), 400 #TODO replace jsonify with error page
-    
+        return jsonify({"error": "Invalid input"}), 400
+
     selected_text = data.get("text", "")
+    mode = data.get("mode", "simplified")  # default is simplified
 
     if not selected_text:
-        return jsonify({"error": "No text provided"}), 400 #TODO replace jsonify with error page
-    
-    print("Selected text received in Flask app:", selected_text)  # Debugging line
-    defined_text = define_text(selected_text)
+        return jsonify({"error": "No text provided"}), 400
 
-    print("Defined text received from AI module:", defined_text)  # Debugging line
+    print(f"Selected text: {selected_text}, Mode: {mode}")
 
-    return render_template("popup.html", defined_text = defined_text)
+    # Call different AI functions depending on mode
+    if mode == "simplified":
+        reply = define_text(selected_text)
+    elif mode == "detailed":
+        reply = detailed_explanation(selected_text)
+    elif mode == "diagrams":
+        reply = diagram_text(selected_text)
+    else:
+        reply = "Unknown mode."
+
+    return jsonify({"reply": reply})
+
 
 if __name__ == "__main__":
     app.run(debug=True)
+

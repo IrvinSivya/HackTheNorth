@@ -6,10 +6,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const selectedText = window.getSelection().toString();
         console.log("Selected text:", selectedText);
 
-        fetch("http://127.0.0.1:5000/log", {
+        fetch("http://127.0.0.1:5000/explain", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ selected_text: selectedText })
+            body: JSON.stringify({ text: selectedText })
         })
         .then(res => res.text())
         .then(txt => console.log("✅ Sent to Python, response:", txt))

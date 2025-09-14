@@ -2,20 +2,15 @@
   "manifest_version": 3,
   "name": "Intellisage",
   "version": "1.0",
-  "description": "Hover over keywords to see definitions and summaries.",
-  "permissions": ["activeTab", "scripting", "storage"],
-  "background": {
-    "service_worker": "background.js"
-  },
-  "action": {
-    "default_popup": "popup.html",
-    "default_title": "Intellisage"
-  },
+  "permissions": ["tabs", "activeTab", "scripting", "storage"],
+  "background": { "service_worker": "background.js" },
   "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "css": ["styles.css"]
+    { "matches": ["<all_urls>"], "js": ["content.js"] }
+  ],
+  "commands": {
+    "send_selected_text": {
+      "suggested_key": { "default": "Ctrl+Shift+K" },
+      "description": "Send selected text to Python"
     }
-  ]
+  }
 }

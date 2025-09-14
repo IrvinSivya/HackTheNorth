@@ -52,6 +52,6 @@ def question_text(selected_text, question):
         f"Keep explanations concise, clear, and directly tied to the selected text."
         f"If the question is not related to text at all then just provide the best possible answer."
         f"Do NOT include BOLD letters or asterics in you answers"
-        f"Do NOT ask back questions")
+        f"Do NOT ask back questions and max of 10 lines unless users asks for a detailed explanation")
     return call_gemini(selected_text + "Question is: " + question , system_prompt)
 

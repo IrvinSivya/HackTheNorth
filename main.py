@@ -1,7 +1,7 @@
 import os
 
 from flask import Flask, render_template, request, url_for, redirect, jsonify, send_file
-from AIResponses import summarize_text
+from AI import define_text
 
 app = Flask(__name__)
 
@@ -25,7 +25,7 @@ def summarize():
     if not selected_text:
         return jsonify({"error": "No text provided"}), 400 #TODO reaplce jsonify with error page
     
-    summarized_text = summarize_text(selected_text)
+    summarized_text = define_text(selected_text)
 
     return render_template("summary.html", summarized_text=summarized_text)
 

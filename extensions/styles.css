@@ -29,3 +29,8 @@
 #wiki-popup .content {
   font-size: 14px;
 }
+
+.hidden {
+  display: none;
+}
+
